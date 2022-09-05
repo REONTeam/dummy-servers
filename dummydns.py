@@ -3,7 +3,7 @@
 import socket, struct
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s.bind(("", 5353))
+s.bind(("", 53))
 
 def query(name, qtype):
     # Put custom domain names here
