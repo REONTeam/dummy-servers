@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 
-import socket, struct
+import socket, struct, sys
 
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s.bind(("", 53))
+default_address_dummydns = ["", 53]
 
 def query(name, qtype):
     # Put custom domain names here
@@ -44,36 +43,56 @@ def read_name(data, offs):
         offs += len
     return res, offs
 
-while True:
-    mesg, addr = s.recvfrom(512)
-    id, flags, qdcount, ancount, nscount, arcount = struct.unpack_from("!HHHHHH", mesg, 0)
+def main(host=default_address_dummydns[0], port=default_address_dummydns[1]):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.bind((host, port))
+    while True:
+        mesg, addr = s.recvfrom(512)
+        id, flags, qdcount, ancount, nscount, arcount = struct.unpack_from("!HHHHHH", mesg, 0)
 
-    # Make sure we're receiving a normal query
-    if (flags & 0xFE8F) != 0:
-        continue
-    if qdcount == 0:
-        continue
+        # Make sure we're receiving a normal query
+        if (flags & 0xFE8F) != 0:
+            continue
+        if qdcount == 0:
+            continue
 
-    # Make result flags
-    resflags = 0x8000
-    # If recursion is desired, set it as available
-    if flags & 0x0100:
-        resflags |= 0x0180
+        # Make result flags
+        resflags = 0x8000
+        # If recursion is desired, set it as available
+        if flags & 0x0100:
+            resflags |= 0x0180
 
-    # Read first query section
-    qname, offs = read_name(mesg, 12)
-    qtype, qclass = struct.unpack_from("!HH", mesg, offs)
-    if qclass != 1 or (qtype != 1 and qtype != 28):
-        continue
-    resname = make_name(qname)
-    resdata = query(qname, qtype)
+        # Read first query section
+        qname, offs = read_name(mesg, 12)
+        qtype, qclass = struct.unpack_from("!HH", mesg, offs)
+        if qclass != 1 or (qtype != 1 and qtype != 28):
+            continue
+        resname = make_name(qname)
+        resdata = query(qname, qtype)
 
-    # Encode result
-    res = bytearray()
-    res += struct.pack("!HHHHHH", id, resflags, 1, 1, 0, 0)
-    res += resname
-    res += struct.pack("!HH", qtype, qclass)
-    res += b'\xc0\x0c'
-    res += struct.pack("!HHIH", qtype, qclass, 0, len(resdata))
-    res += resdata
-    s.sendto(res, addr)
+        # Encode result
+        res = bytearray()
+        res += struct.pack("!HHHHHH", id, resflags, 1, 1, 0, 0)
+        res += resname
+        res += struct.pack("!HH", qtype, qclass)
+        res += b'\xc0\x0c'
+        res += struct.pack("!HHIH", qtype, qclass, 0, len(resdata))
+        res += resdata
+        print(len(res))
+        s.sendto(res, addr)
+
+if __name__ == "__main__":
+    port = None
+
+    if len(sys.argv) > 1:
+        try:
+            port = int(sys.argv[1])
+            if (port < 0) or (port > 65535):
+                port = None
+        except:
+            pass
+    if port is None:
+        port = default_address_dummydns[1]
+
+    print("Starting Dummy DNS on port " + str(port))
+    main(port=port)

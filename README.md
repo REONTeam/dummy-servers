@@ -13,3 +13,6 @@ Make sure python is installed, then run the following in separate terminals (On 
 
 Then run libmobile-bgb as follows:
 * `./mobile --dns1 127.0.0.1`
+
+If the default DNS port is already in use, you can specify a different port by running:
+* `sudo ./dummydns.py new_port`
