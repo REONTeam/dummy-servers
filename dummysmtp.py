@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from time import sleep
 import socket
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -12,7 +13,8 @@ while True:
     sock.send(b"+OK\r\n")
     while True:
         msg = sock.recv(1024).decode()
-        print(msg)
+        if msg != "":
+            print(msg)
 
         if msg.startswith("USER"):
             sock.send(b"+OK\r\n")
@@ -21,5 +23,7 @@ while True:
         if msg.startswith("STAT"):
             sock.send(b"+OK 0 0\r\n")
         if msg.startswith("QUIT"):
+            sock.send(b"+OK bye\r\n")
+            sleep(0.5)
             sock.close()
             break
