@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 
 from time import sleep
-import socket, sys
+import socket, sys, signal
 
-default_address_dummysmtp = ["", 110]
+default_address_dummysmtp = ["127.0.0.1", 110]
 default_dummysmtp_sleep_time = 0.5
+
+def dummysmtp_ctrl_c_handler(signum, frame):
+    print("Pressed CTRL+C!")
+    sys.exit(0)
 
 def main(host=default_address_dummysmtp[0], port=default_address_dummysmtp[1], sleep_time=default_dummysmtp_sleep_time):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -33,6 +37,7 @@ def main(host=default_address_dummysmtp[0], port=default_address_dummysmtp[1], s
                 break
 
 if __name__ == "__main__":
+    signal.signal(signal.SIGTERM, dummysmtp_ctrl_c_handler)
     port = None
 
     if len(sys.argv) > 1:

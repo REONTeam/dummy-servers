@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 
-import socket, struct, sys
+import socket, struct, sys, signal
 
-default_address_dummydns = ["", 53]
+default_address_dummydns = ["127.0.0.1", 53]
+
+def dummydns_ctrl_c_handler(signum, frame):
+    print("Pressed CTRL+C!")
+    sys.exit(0)
 
 def query(name, qtype):
     # Put custom domain names here
@@ -82,6 +86,7 @@ def main(host=default_address_dummydns[0], port=default_address_dummydns[1]):
         s.sendto(res, addr)
 
 if __name__ == "__main__":
+    signal.signal(signal.SIGTERM, dummydns_ctrl_c_handler)
     port = None
 
     if len(sys.argv) > 1:

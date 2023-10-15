@@ -1,2 +1,2 @@
 #!/bin/sh
-python3 -m http.server -b localhost 80
+python3 -m http.server -b 127.0.0.1 80
