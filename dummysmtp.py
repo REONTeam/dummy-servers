@@ -21,5 +21,6 @@ while True:
         if msg.startswith("STAT"):
             sock.send(b"+OK 0 0\r\n")
         if msg.startswith("QUIT"):
+            sock.send(b"+OK\r\n")
             sock.close()
             break
