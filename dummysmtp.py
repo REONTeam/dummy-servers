@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import socket, signal
+import socket, signal, sys
 
 # Avoid locking up on windows
 signal.signal(signal.SIGINT, lambda *_: sys.exit())
@@ -15,6 +15,8 @@ while True:
     sock.send(b"+OK\r\n")
     while True:
         msg = sock.recv(1024).decode()
+        if not msg:
+            break
         print(msg)
 
         if msg.startswith("USER"):
