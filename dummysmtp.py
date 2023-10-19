@@ -2,16 +2,20 @@
 
 import socket, signal, sys
 
-# Avoid locking up on windows
-signal.signal(signal.SIGINT, lambda *_: sys.exit())
-
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 s.bind(("", 110))
-s.listen(10)
+s.listen(1)
+
+# Avoid locking up on windows
+signal.signal(signal.SIGINT, lambda *_: sys.exit())
+s.settimeout(0.1)
 
 while True:
-    sock, addr = s.accept()
+    try:
+        sock, addr = s.accept()
+    except TimeoutError:
+        continue
     sock.send(b"+OK\r\n")
     while True:
         msg = sock.recv(1024).decode()

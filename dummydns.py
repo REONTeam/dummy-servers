@@ -2,15 +2,16 @@
 
 import socket, struct, signal, sys
 
-# Avoid locking up on windows
-signal.signal(signal.SIGINT, lambda *_: sys.exit())
-
 port = 53
 if len(sys.argv) > 1:
     port = int(sys.argv[1])
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.bind(("", port))
+
+# Avoid locking up on windows
+signal.signal(signal.SIGINT, lambda *_: sys.exit())
+s.settimeout(0.1)
 
 def query(name, qtype):
     # Put custom domain names here
@@ -52,7 +53,10 @@ def read_name(data, offs):
     return res, offs
 
 while True:
-    mesg, addr = s.recvfrom(512)
+    try:
+        mesg, addr = s.recvfrom(512)
+    except TimeoutError:
+        continue
     id, flags, qdcount, ancount, nscount, arcount = struct.unpack_from("!HHHHHH", mesg, 0)
 
     # Make sure we're receiving a normal query
