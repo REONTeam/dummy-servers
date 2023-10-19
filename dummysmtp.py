@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
-import socket
+import socket, signal
+
+# Avoid locking up on windows
+signal.signal(signal.SIGINT, lambda *_: sys.exit())
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

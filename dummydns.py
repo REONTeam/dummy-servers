@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
-import socket, struct, sys
+import socket, struct, signal, sys
+
+# Avoid locking up on windows
+signal.signal(signal.SIGINT, lambda *_: sys.exit())
 
 port = 53
 if len(sys.argv) > 1:
