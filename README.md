@@ -6,10 +6,16 @@ Just-enough server programs for testing purposes. Can be used to get libmobile-b
 Sample usage with libmobile-bgb
 -------------------------------
 
-Make sure python is installed, then run the following in separate terminals (On windows, you can run this without sudo):
+Make sure python is installed, then run the following in separate terminals (On windows, you can run this without `sudo`):
 * `sudo ./dummydns.py`
 * `sudo ./dummysmtp.py`
 * `sudo ./http.sh` (optional)
 
 Then run libmobile-bgb as follows:
 * `./mobile --dns1 127.0.0.1`
+
+If the default DNS port is already in use, you can specify a different port by running:
+* `sudo ./dummydns.py <port>`
+
+And use the `mobile` program as follows:
+* `./mobile --dns1 127.0.0.1 --dns_port <port>`

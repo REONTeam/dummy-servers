@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 
-import socket, struct
+import socket, struct, sys
+
+port = 53
+if len(sys.argv) > 1:
+    port = int(sys.argv[1])
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s.bind(("", 53))
+s.bind(("", port))
 
 def query(name, qtype):
     # Put custom domain names here
