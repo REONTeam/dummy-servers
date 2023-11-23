@@ -8,7 +8,7 @@ Sample usage with libmobile-bgb
 
 Make sure python is installed, then run the following in separate terminals (On windows, you can run this without `sudo`):
 * `sudo ./dummydns.py`
-* `sudo ./dummysmtp.py`
+* `sudo ./dummypop.py`
 * `sudo ./http.sh` (optional)
 
 Then run libmobile-bgb as follows:
